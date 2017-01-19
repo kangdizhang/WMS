@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.dbview.dao.DatatableDao">
+    <select id="listPage" resultType="pd">
+        select
+        UT.TABLE_NAME ,
+        UT.TABLE_TYPE,
+        UT.COMMENTS,
+        pk.pk_info,
+        fk.fk_info,
+        un.unique_column,
+        non.non_column,
+        tri.tri_info
+        from
+        USER_TAB_COMMENTS UT
+        left join(
+        SELECT
+        wm_concat(fk_info) AS fk_info,
+        fks.TABLE_NAME
+        FROM
+        (
+        SELECT
+        REPLACE(
+        wm_concat(cu.column_name),
+        ',',
+         <![CDATA[  '&'  ]]>
+        ) || '|' || cu.constraint_name AS fk_info,
+        cu.TABLE_NAME
+        FROM
+        user_cons_columns cu,
+        user_constraints au
+        WHERE
+        cu.constraint_name = au.constraint_name
+        AND au.constraint_type = 'R'
+        GROUP BY
+        cu.constraint_name,
+        cu.TABLE_NAME
+        ) fks
+        GROUP BY
+        fks.TABLE_NAME
+        ) fk on fk.table_name = UT.TABLE_NAME
+        left join(
+        select
+        replace(
+        wm_concat(cu.column_name),
+        ',',
+        <![CDATA[  '&'  ]]>
+        ) || '|' || cu.constraint_name as pk_info,
+        cu.table_name
+        from
+        user_cons_columns cu,
+        user_constraints au
+        where
+        cu.constraint_name = au.constraint_name
+        and au.constraint_type = 'P'
+        group by
+        cu.constraint_name,
+        cu.table_name
+        ) pk on pk.table_name = UT.table_name
+        left join(
+        select
+        replace(
+        wm_concat(t .column_name),
+        ',',
+        <![CDATA[  '&'  ]]>
+        ) as unique_column,
+        t .table_name,
+        i.uniqueness
+        from
+        user_ind_columns t,
+        user_indexes i
+        where
+        t .index_name = i.index_name
+        and t .table_name = i.table_name
+        and i.uniqueness = 'UNIQUE'
+        group by
+        t .table_name,
+        i.uniqueness
+        ) un on un.table_name = UT.table_name
+        left join(
+        select
+        wm_concat(column_name) as non_column,
+        table_name
+        from
+        (
+        select
+        replace(
+        wm_concat(t .column_name),
+        ',',
+        <![CDATA[  '&'  ]]>
+        ) || '|' || i.index_name as column_name,
+        t .table_name
+        from
+        user_ind_columns t,
+        user_indexes i
+        where
+        t .index_name = i.index_name
+        and t .table_name = i.table_name
+        and i.uniqueness = 'NONUNIQUE'
+        group by
+        t .table_name,
+        i.index_name
+        )
+        group by
+        table_name
+        ) non on non.table_name = UT.table_name
+        left join (select
+        REPLACE(
+        wm_concat(
+        'TRIGGER^' || TRIGGER_NAME || '>>>>>' || TRIGGER_TYPE || '>>>>>' || TRIGGERING_EVENT
+        ),
+        ',',
+        '|||||'
+        ) as tri_info,
+        TABLE_NAME
+        from
+        USER_TRIGGERS
+        GROUP BY
+        TABLE_NAME) tri on tri.TABLE_NAME=UT.TABLE_NAME
+        <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+            WHERE ut.table_name like '%${pd.keywords}%'
+        </if>
+        order by
+        ut.table_name
+       </select>
+    <select id="columnslistPage"  resultType="pd">
+        select UC.column_name "columnName",
+        UC.data_type "columnType",
+        UC.DATA_LENGTH "columnLength",
+        UCC.COMMENTS "columnMark",
+        UC.DATA_SCALE "columnScale",
+        case uc.NULLABLE
+        when 'Y'
+        then 'N'
+        else 'Y'
+        end "notNull"
+        from user_tab_columns UC
+        left join user_col_comments UCC
+        ON UC.TABLE_NAME = UCC.TABLE_NAME
+        AND UC.COLUMN_NAME = UCC.COLUMN_NAME
+        <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+            WHERE uc.table_name = #{pd.keywords}
+        </if>
+    </select>
+
+    <select id="indexlistPage" resultType="pd">
+        select
+        i.INDEX_NAME "indexName",
+        i.COLUMN_NAME "indexKey"
+        from user_ind_columns i
+        <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+            WHERE i.TABLE_NAME = #{pd.keywords}
+        </if>
+    </select>
+    <select id="triggerlistPage"  resultType="pd">
+      SELECT US.name "triggerName", US.TYPE "triggerKey", US.TEXT "triggerContent"
+      FROM USER_SOURCE US
+      WHERE US.TYPE in ('TRIGGER', 'PROCEDURE')
+        <if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+            and US.name like   '%${pd.keywords}%'
+        </if>
+    </select>
+</mapper>

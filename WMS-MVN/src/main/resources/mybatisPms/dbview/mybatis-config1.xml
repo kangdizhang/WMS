@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD SQL Map Config 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings> 
+        <setting name="cacheEnabled" value="true" /><!-- 全局映射器启用缓存 -->   
+        <setting name="useGeneratedKeys" value="true" /> 
+        <setting name="defaultExecutorType" value="REUSE" /> 
+    </settings>
+	<typeAliases>
+		<typeAlias type="com.pms.dbview.model.Columns" alias="columns"/>
+		<typeAlias type="com.pms.dbview.model.Indexs" alias="indexs"/>
+		<typeAlias type="com.pms.dbview.model.Tables" alias="tables"/>
+		<typeAlias type="com.pms.dbview.model.Triggers" alias="triggers"/>
+		<typeAlias type="com.ectrip.util.PageData" alias="pd"/>
+		<!-- 分页 -->
+		<typeAlias type="com.ectrip.entity.Page" alias="Page"/>
+	</typeAliases>
+
+	<plugins>
+		<plugin interceptor="com.ectrip.plugin.PagePluginOracle">
+			<property name="dialect" value="Oracle"/>
+			<property name="pageSqlId" value=".*listPage.*"/>
+		</plugin>
+	</plugins>
+</configuration>
