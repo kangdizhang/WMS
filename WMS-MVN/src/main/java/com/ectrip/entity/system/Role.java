@@ -10,15 +10,17 @@ package com.ectrip.entity.system;
 * @version 1.0
  */
 public class Role {
-	private String ROLE_ID;
-	private String ROLE_NAME;
-	private String RIGHTS;
-	private String PARENT_ID;
-	private String ADD_QX;
-	private String DEL_QX;
-	private String EDIT_QX;
-	private String CHA_QX;
-	
+	private String ROLE_ID;    //角色id
+	private String ROLE_NAME;	 //角色名称
+	private String RIGHTS;	 //权限
+	private String PARENT_ID; //？（父角色ID？）
+	private String ADD_QX;	 //？（增权限？）
+	private String DEL_QX;	 //？（删权限？）
+	private String EDIT_QX;	 //？（改权限？）
+	private String CHA_QX;	 //？（查权限？）
+	private String UTIME;		 //操作时间
+	private int STATUS;			 //角色状态（0：启用，1：停用）
+
 	public String getROLE_ID() {
 		return ROLE_ID;
 	}
@@ -67,6 +69,20 @@ public class Role {
 	public void setCHA_QX(String cHA_QX) {
 		CHA_QX = cHA_QX;
 	}
-	
-	
+
+	public String getUTIME() {
+		return UTIME;
+	}
+
+	public void setUTIME(String UTIME) {
+		this.UTIME = UTIME;
+	}
+
+	public int getSTATUS() {
+		return STATUS;
+	}
+
+	public void setSTATUS(int STATUS) {
+		this.STATUS = STATUS;
+	}
 }

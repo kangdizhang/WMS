@@ -21,9 +21,9 @@ public class Menu {
 	private String MENU_ICON;	//图标
 	private String MENU_TYPE;	//类型
 	private String MENU_STATE;	//菜单状态
-	private String target;
-	private Menu parentMenu;
-	private List<Menu> subMenu;
+	private String target;	//菜单标签
+	private Menu parentMenu;	//父菜单
+	private List<Menu> subMenu;	//子菜单列表
 	private boolean hasMenu = false;
 	
 	public String getMENU_ID() {
