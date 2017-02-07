@@ -14,6 +14,7 @@ import java.util.List;
 public interface MenuDao {
 
 	/**
+	 * 获取所有子菜单
 	 * @param parentId
 	 * @return
 	 * @throws Exception
